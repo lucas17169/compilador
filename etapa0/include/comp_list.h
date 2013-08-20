@@ -1,5 +1,5 @@
 
-typedef struct item{
+typedef struct comp_list{
 	int data;
 	struct comp_list_t *next;
 	struct comp_list_t *prev;

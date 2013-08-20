@@ -36,7 +36,7 @@ comp_tree* edit(int new_data, comp_tree* node, comp_tree* root){
 }
 
 comp_tree* search(comp_tree* node, comp_tree* root){
-	if(node == NULL)
+	if(root == NULL)
 		return NULL;
 	else{
 		if(node == root)
