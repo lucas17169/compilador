@@ -12,6 +12,7 @@
 %{
 
 #include "tokens.h"
+#include "comp_dict.h"
 
 %}
 
@@ -27,7 +28,7 @@ WHITESPACE  [ \t\v\f]*
 
 /* Regras */
 %%
-\n			        { yylineno++; }
+\n			    { yylineno++; }
 {WHITESPACE}    { }
 "int"           { return TK_PR_INT; }
 "float"         { return TK_PR_FLOAT; }
@@ -51,24 +52,39 @@ WHITESPACE  [ \t\v\f]*
 "+"|"-"         { return yytext[0]; }
 "*"|"/"         { return yytext[0]; }
 "<"|">"	        { return yytext[0]; }
-"="|"!"  	      { return yytext[0]; }
-"&"|"$"  	      { return yytext[0]; }
-"<="		        { return TK_OC_LE; }
-">="		        { return TK_OC_GE; }
-"=="		        { return TK_OC_EQ; }
-"!="		        { return TK_OC_NE; }
-"&&"		        { return TK_OC_AND; }
-"||"		        { return TK_OC_OR; }
-{ID}            { return TK_IDENTIFICADOR; }
-{INT}           { return TK_LIT_INT; }
-{FLOAT}         { return TK_LIT_FLOAT; }
-{CHAR}          { return TK_LIT_CHAR; }
-{STRING}        { return TK_LIT_STRING; }
-"/*"	          { BEGIN( MLCOMMENT ); }
+"="|"!"  	    { return yytext[0]; }
+"&"|"$"  	    { return yytext[0]; }
+"<="		    { return TK_OC_LE; }
+">="		    { return TK_OC_GE; }
+"=="		    { return TK_OC_EQ; }
+"!="		    { return TK_OC_NE; }
+"&&"		    { return TK_OC_AND; }
+"||"		    { return TK_OC_OR; }
+{ID}            { dict_insert(dictionary, yytext, TK_IDENTIFICADOR, yylineno); return TK_IDENTIFICADOR; }
+{INT}           { dict_insert(dictionary, yytext, TK_LIT_INT, yylineno); return TK_LIT_INT; }
+{FLOAT}         { dict_insert(dictionary, yytext, TK_LIT_FLOAT, yylineno); return TK_LIT_FLOAT; }
+{CHAR}          { dict_insert(dictionary, yytext, TK_LIT_CHAR, yylineno); return TK_LIT_CHAR; }
+{STRING}        { dict_insert(dictionary, yytext, TK_LIT_STRING, yylineno); return TK_LIT_STRING; }
+"/*"	        { BEGIN( MLCOMMENT ); }
 "//"[^\r\n]*    { }
 <MLCOMMENT>"*/" { BEGIN( INITIAL ); }
 <MLCOMMENT>.    {  }
-<MLCOMMENT>\n	  { yylineno++; }
+<MLCOMMENT>\n	{ yylineno++; }
 .               { return TOKEN_ERRO; }
 %%
+
+int getLineNumber(void){
+  return yylineno;
+}
+
+void setYyin(FILE *input)
+{
+    yyin = input;
+}
+
+FILE* getYyin(void)
+{
+    return yyin;
+}
+
 
